@@ -25,6 +25,16 @@ func printVersion(c *cli.Context) error {
 	return nil
 }
 
+func build(c *cli.Context) error {
+	dir := c.String("dir")
+
+	err := cmd.RunHook(dir, "build")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func getSchemaStatus(c *cli.Context) error {
 	dir := c.String("dir")
 
@@ -210,6 +220,11 @@ func main() {
 				Name:   "version",
 				Usage:  "Build information",
 				Action: printVersion,
+			},
+			{
+				Name:   "build",
+				Usage:  "Runs the build hook",
+				Action: build,
 			},
 		},
 	}
