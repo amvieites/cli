@@ -7,21 +7,34 @@ import (
 	"os"
 	"path"
 
+	"github.com/xataio/cli/buildvar"
 	"github.com/xataio/cli/cmd"
 	"github.com/xataio/cli/config"
 	"github.com/xataio/cli/filesystem"
 
+	"github.com/pkg/browser"
 	"github.com/urfave/cli/v2"
 )
 
-var (
-	GitCommit string = "unset"
-	BuildDate string = "unset"
-	Version   string = "unset"
-)
-
 func printVersion(c *cli.Context) error {
-	fmt.Printf("%s %s\n", c.App.Name, Version)
+	fmt.Printf("%s %s\n", c.App.Name, buildvar.Version)
+	return nil
+}
+
+func browse(c *cli.Context) error {
+	dir := c.String("dir")
+
+	settings, err := cmd.ReadSettings(dir)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("https://app.xata.io/workspaces/%s/dbs/%s", settings.WorkspaceID, settings.DBName)
+
+	err = browser.OpenURL(url)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -225,6 +238,11 @@ func main() {
 				Name:   "build",
 				Usage:  "Runs the build hook",
 				Action: build,
+			},
+			{
+				Name:   "browse",
+				Usage:  "Open current database in the default web browser",
+				Action: browse,
 			},
 		},
 	}
